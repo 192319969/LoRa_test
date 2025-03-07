@@ -1,16 +1,59 @@
 #include <Arduino.h>
 #include "LoRaModule.h"
 #include "LedController.h"
+#include "esp_system.h"
 
 // put function declarations here:
 
 LoRaModule lora;
 //LedController led(4);  // 使用GPIO4作为LED引脚
 
+/* 读取ESP32的MAC地址作为唯一标识符输出到Serial */
+void printDeviceID() {
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_WIFI_STA); // 获取 Wi-Fi MAC 地址
+    Serial.print("Device ID (MAC): ");
+    for (int i = 0; i < 6; i++) {
+        if (i > 0) Serial.print(":");
+        Serial.print(mac[i], HEX);
+    }
+    Serial.println();
+}
+
 void setup() {
   Serial.begin(115200);
+
+  // 打印设备 ID
+
+  printDeviceID;
+
   
-  /* 初始化LED */
+  
+  /* LED接线测试 *
+  pinMode(4, OUTPUT);
+  Serial.println("report_00: " + String(digitalRead(4)));
+  digitalWrite(4, HIGH);
+  Serial.println("report_01: " + String(digitalRead(4)));
+  delay(1000);
+  digitalWrite(4, LOW);
+  Serial.println("report_02: " + String(digitalRead(4)));
+  delay(1000);
+  digitalWrite(4, HIGH);
+  Serial.println("report_03: " + String(digitalRead(4)));
+  delay(1000);
+  /**
+  digitalWrite(4, LOW);
+  Serial.println("report_04: " + String(digitalRead(4)));
+  delay(1000);
+  Serial.println("report_05: " + String(digitalRead(4)));
+  led.begin();
+  led.turnOn();
+  Serial.println("report_06: " + String(digitalRead(4)));
+  delay(1000);
+  led.turnOff();
+
+
+  /* 初始化LED *
   led.begin();
   led.setBlinkFrequency(1000);  // 默认1秒闪烁一次
   
@@ -82,10 +125,12 @@ void setup() {
 }
 
 void loop() {
-  /* 以下暂定为LED测试 */
+  /* 以下暂定为LED测试 *
   // 更新LED状态
   led.update();
   
+  
+
   // 检查串口命令
   if (Serial1.available()) {
     Serial.println("[Debug Serial]:Start to receive data.");
@@ -102,12 +147,16 @@ void loop() {
       Serial.println("[Debug Serial]:Set LED frequency to " + String(freq) + "ms");
     }
     else if (command == "on") {
+      Serial.println("report_on_01: " + String(digitalRead(4)));
       led.turnOn();
       Serial.println("[Debug Serial]:LED turned on");
+      Serial.println("report_on_02: " + String(digitalRead(4)));
     }
     else if (command == "off") {
+      Serial.println("report_off_01: " + String(digitalRead(4)));
       led.turnOff();
       Serial.println("[Debug Serial]:LED turned off");
+      Serial.println("report_off_02: " + String(digitalRead(4)));
     }
     else if (command.startsWith("bright")) {
       // 设置亮度，格式：bright 255
